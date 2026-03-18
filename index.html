@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Travel Book</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/globe.gl"></script>
@@ -13,8 +14,10 @@
     </div>
 
     <div id="search-container">
-        <input type="text" id="city-input" placeholder="도시 이름을 영어로 입력 (예: Seoul)">
-        <button onclick="searchCity()">검색</button>
+        <form id="searchform" onsubmit="handleSearch(event)">
+            <input type="text" id="city-input" placeholder="도시 이름을 영어로 입력 (예: Seoul)">
+            <button onclick="searchCity()">검색</button>
+        </form>
     </div>
 
     <div id="globeViz"></div>

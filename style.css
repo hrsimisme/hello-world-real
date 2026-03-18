@@ -29,6 +29,7 @@ body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
 #city-input {
     width: 250px; padding: 10px; border-radius: 20px; border: 1px solid #fff;
     background: rgba(255,255,255,0.2); color: white; outline: none;
+    font-size: 16px;
 }
 #search-container button {
     padding: 10px 20px; border-radius: 20px; border: none;

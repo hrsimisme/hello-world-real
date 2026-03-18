@@ -50,6 +50,14 @@ function resetInput() {
     currentImageData = "";
 }
 
+// 검색창
+function handleSearch(event) {
+    event.preventDefault(); // 페이지 새로고침 방지
+    const query = event.target.querySelector('input').value;
+    alert(query + "를 검색합니다!"); // 여기에 실제 검색 로직 추가
+}
+
+
 // [함수] 책 닫기 (에러 해결 핵심!)
 function closeBook(e) {
     if (e) e.stopPropagation();
