@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>My Travel Book</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/globe.gl"></script>
+</head>
+<body>
+    <div class="header-title">
+        <h1>Hello World !</h1>
+        <p id="dynamic-subtitle" class="subtitle">당신의 기억을 기록하세요</p>
+    </div>
+
+    <div id="search-container">
+        <input type="text" id="city-input" placeholder="도시 이름을 영어로 입력 (예: Seoul)">
+        <button onclick="searchCity()">검색</button>
+    </div>
+
+    <div id="globeViz"></div>
+
+    <div id="book-container" class="book-container">
+        <button class="close-book-btn" onclick="closeBook(event)">&times;</button>
+        <div class="book" id="book-body">
+            <div class="front-cover" onclick="openBook()">
+                <button class="close-btn" onclick="closeBook(event)">×</button>
+                <div class="cover-content">
+                    <span class="icon">📖</span>
+                    <h3>나의 여행 일기</h3>
+                    <p id="cover-location">장소를 검색하세요</p>
+                </div>
+            </div>
+            <div class="inner-page">
+                <div class="page-container">
+                    <div class="page-left">
+                        <div class="photo-frame" onclick="triggerUpload()">
+                            <img id="preview-img" src="" style="display:none;">
+                            <div id="photo-placeholder">
+                                <span class="magic-icon">🖼️</span>
+                                <p>기억을 담으세요</p>
+                            </div>
+                        </div>
+                        <input type="file" id="image-input" accept="image/*" style="display:none;" onchange="handleImage(this)">
+                    </div>
+            
+                    <div class="page-right">
+                        <h2 id="locationName">LOCATION</h2>
+                        <div class="input-group">
+                            <input type="date" id="travelDate">
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="travelTitle" placeholder="제목">
+                        </div>
+                        <div class="input-group">
+                            <textarea id="travelNote" rows="8" placeholder="오늘의 모험은 어땠나요?"></textarea>
+                        </div>
+                        <div class="input-group" style="display: flex; gap: 10px;">
+                            <button class="save-btn" onclick="saveDiary()">기록 저장</button>
+                            <button id="delete-btn" class="delete-btn" onclick="deleteDiary()" style="display:none;">기록 삭제</button>
+                        </div>
+                        <div id="confirm-modal" class="custom-alert" style="display:none;">
+                            <p id="confirm-message">이 소중한 추억을 정말 지우시겠습니까? 🕯️</p>
+                            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                                <button onclick="executeDelete()" style="background: #a33c3c;">삭제</button>
+                                <button onclick="closeConfirm()" style="background: #6b6b6b;">취소</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="custom-alert" class="custom-alert" style="display:none;">
+                <p id="alert-message"></p>
+                <button onclick="closeAlert()">확인</button>
+            </div>
+
+    <script src="data.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
