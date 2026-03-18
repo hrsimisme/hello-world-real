@@ -46,3 +46,5 @@ const initialDiaries = [
         coords: { lat: -8.5069, lng: 115.2625 }
     }
 ];
+
+window.myDiaries = JSON.parse(localStorage.getItem('myTravelDiaries')) || initialDiaries;

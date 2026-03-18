@@ -1,8 +1,9 @@
 // 1. 전역 변수 (맨 위에 배치)
-let myDiaries = (typeof initialDiaries !== 'undefined') ? initialDiaries : (JSON.parse(localStorage.getItem('myTravelDiaries')) || []);
+let myDiaries = JSON.parse(localStorage.getItem('myTravelDiaries')) || initialDiaries;
 let currentImageData = ""; 
 let currentSelectedIndex = -1;
 const bookContainer = document.getElementById('book-container');
+
 
 // 서브 타이틀 애니메이션
 
@@ -54,9 +55,8 @@ function resetInput() {
 function handleSearch(event) {
     event.preventDefault(); // 페이지 새로고침 방지
     const query = event.target.querySelector('input').value;
-    alert(query + "를 검색합니다!"); // 여기에 실제 검색 로직 추가
+    // alert(query + "를 검색합니다!"); // 여기에 실제 검색 로직 추가
 }
-
 
 // [함수] 책 닫기 (에러 해결 핵심!)
 function closeBook(e) {
@@ -75,55 +75,49 @@ function closeBook(e) {
 
 // [함수] 핀 업데이트
 function updateMarkers() {
-    world.htmlElementsData(myDiaries)
-        .htmlLat(d => d.coords ? d.coords.lat : d.lat)  // coords 안의 lat 찾기
-        .htmlLng(d => d.coords ? d.coords.lng : d.lng)  // coords 안의 lng 찾기
+    // data.js에서 선언한 window.myDiaries를 사용합니다.
+    world.htmlElementsData(window.myDiaries)
+        .htmlLat(d => d.coords ? d.coords.lat : d.lat)  // 좌표 구조 대응
+        .htmlLng(d => d.coords ? d.coords.lng : d.lng)
         .htmlElement(d => {
             const el = document.createElement('div');
             el.className = 'pin-container';
-            el.innerHTML = `
-                <div class="pin-label">${d.location}</div>
-                <div class="pin-icon" style="font-size: 24px;">📍</div>
-            `;
-
-            el.onmouseenter = () => { world.controls().autoRotate = false; };
-            el.onmouseleave = () => {
-                if (!bookContainer.classList.contains('active')) world.controls().autoRotate = true;
-            };
+            el.style.pointerEvents = 'auto';
+            el.innerHTML = `<div class="pin-label">${d.location}</div><div class="pin-icon">📍</div>`;
 
             el.onclick = (e) => {
-    e.stopPropagation(); // 지구가 같이 클릭되는 것 방지
-    
-    // 1. 일기장 컨테이너 가져오기
-    const bookContainer = document.getElementById('book-container');
-    
-    // 2. 데이터 채워넣기
-    document.getElementById('locationName').innerText = d.location;
-    document.getElementById('travelTitle').value = d.title;
-    document.getElementById('travelDate').value = d.date;
-    document.getElementById('travelNote').value = d.content;
-    
-    // 3. 사진 처리 (데이터에 img가 있다면)
-    const imgPreview = document.getElementById('preview-img');
-    const placeholder = document.getElementById('photo-placeholder');
-    if (d.img) {
-        imgPreview.src = d.img;
-        imgPreview.style.display = 'block';
-        placeholder.style.display = 'none';
-    }
+                e.stopPropagation();
+                currentSelectedIndex = window.myDiaries.indexOf(d); 
 
-    // 4. 일기장 애니메이션 실행
-    bookContainer.classList.add('active');
-    setTimeout(() => {
-        bookContainer.classList.add('open');
-    }, 100);
-    
-    // 5. 지구가 혼자 도는 것 멈추기
-    world.controls().autoRotate = false;
-};
+                const deleteBtn = document.getElementById('delete-btn');
+                if (deleteBtn) deleteBtn.style.display = 'block';
 
-            return el; // 🔥 이 줄이 있어야 핀이 화면에 그려집니다!
-        }); // 🔥 괄호 닫기 확인
+                document.getElementById('locationName').innerText = d.location;
+                document.getElementById('travelTitle').value = d.title || "";
+                document.getElementById('travelDate').value = d.date || "";
+                document.getElementById('travelNote').value = d.content || "";
+                
+                // 사진 처리 (d.img와 d.image 둘 다 지원)
+                currentImageData = d.img || d.image || "";
+                const imgPreview = document.getElementById('preview-img');
+                const placeholder = document.getElementById('photo-placeholder');
+                
+                if (currentImageData) {
+                    imgPreview.src = currentImageData;
+                    imgPreview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                } else {
+                    imgPreview.src = '';
+                    imgPreview.style.display = 'none';
+                    placeholder.style.display = 'block';
+                }
+
+                bookContainer.classList.add('active');
+                setTimeout(() => { bookContainer.classList.add('open'); }, 100);
+            };
+
+            return el;
+        });
 }
 
 // 3. 지구본 초기화 및 실행
@@ -138,6 +132,11 @@ const world = Globe()
 
 world.controls().autoRotate = true;
 world.controls().autoRotateSpeed = 0.5;
+
+window.addEventListener('resize', () => {
+  world.width(window.innerWidth);
+  world.height(window.innerHeight);
+});
 
 updateMarkers(); // 저장된 핀 그리기
 
@@ -199,7 +198,7 @@ function saveDiary() {
     const content = document.getElementById('travelNote').value;
     const locationName = document.getElementById('locationName').innerText;
     
-    // 현재 카메라가 보고 있는 좌표 (새 핀 생성용)
+    // 현재 지구본이 보고 있는 중심 좌표 (새 핀 생성용)
     const { lat, lng } = world.pointOfView();
 
     if (!title || !content) {
@@ -207,38 +206,39 @@ function saveDiary() {
         return;
     }
 
-    // 2. 데이터 객체 생성 (이미지 유지 로직 포함)
+    // 2. 저장할 데이터 객체 생성
     const newEntry = { 
-        lat: (currentSelectedIndex === -1) ? lat : myDiaries[currentSelectedIndex].lat, 
-        lng: (currentSelectedIndex === -1) ? lng : myDiaries[currentSelectedIndex].lng, 
-        title, 
-        date, 
-        content, 
+        // 기존 수정이면 기존 좌표 유지, 새 글이면 현재 중심 좌표 사용
+        coords: (currentSelectedIndex === -1) 
+            ? { lat: parseFloat(lat), lng: parseFloat(lng) } 
+            : window.myDiaries[currentSelectedIndex].coords, 
+        title: title, 
+        date: date, 
+        content: content, 
         location: locationName, 
-        image: currentImageData 
+        img: currentImageData // 혹은 image
     };
     
-    // 3. 배열에 넣기 또는 수정하기
+    // 3. 🔥 핵심: 배열 업데이트 (삭제 로직 없음!)
     if (currentSelectedIndex === -1) {
-        // 새 글 저장
-        myDiaries.push(newEntry);
+        // 새 글일 때: 배열 끝에 추가
+        window.myDiaries.push(newEntry);
     } else {
-        // 기존 글 수정
-        myDiaries[currentSelectedIndex] = newEntry;
+        // 수정일 때: 해당 위치의 데이터를 통째로 교체 (splice 금지!)
+        window.myDiaries[currentSelectedIndex] = newEntry;
     }
 
-    // 4. 로컬 스토리지에 저장
-    localStorage.setItem('myTravelDiaries', JSON.stringify(myDiaries));
+    // 4. 로컬 스토리지 업데이트
+    localStorage.setItem('myTravelDiaries', JSON.stringify(window.myDiaries));
     
-    // 5. 핀 다시 그리기 및 알림
+    // 5. 화면 갱신 및 알림
     updateMarkers(); 
     showAlert("📜 저장이 완료되었습니다!");
 
-    // 6. 책 닫기 및 인덱스 초기화
+    // 6. 책 닫기 및 상태 초기화
     setTimeout(() => {
         closeBook();
-        currentSelectedIndex = -1;
-        // 🔥 저장 후 삭제 버튼 숨기기
+        currentSelectedIndex = -1; // 인덱스 초기화 필수
         const deleteBtn = document.getElementById('delete-btn');
         if (deleteBtn) deleteBtn.style.display = 'none';
     }, 500);

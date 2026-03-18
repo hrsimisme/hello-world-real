@@ -1,5 +1,5 @@
 body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
-#globeViz { width: 100vw; height: 100vh; }
+#globeViz { width: 100vw; height: 100vh;}
 
 .header-title {
     position: absolute; top: 20px; width: 100%; text-align: center;
@@ -23,8 +23,14 @@ body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
 
 /* 검색창 디자인 */
 #search-container {
+    width: 100%;
+    text-align: center;
     position: absolute; top: 110px; left: 50%; transform: translateX(-50%);
     z-index: 20; display: flex; gap: 10px;
+}
+#searchform {
+    width: fit-content;
+    margin: auto;
 }
 #city-input {
     width: 250px; padding: 10px; border-radius: 20px; border: 1px solid #fff;
@@ -122,8 +128,7 @@ body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
 
 /* 🤎 4. 앞표지 (해리포터 가죽 표지 느낌) */
 .front-cover {
-    background-image: url('https://www.transparenttextures.com/patterns/dark-leather.png'), 
-                      linear-gradient(135deg, #4b2e1d 0%, #2b1a0f 100%);
+    background-image: url('https://www.transparenttextures.com/patterns/dark-leather.png'), linear-gradient(135deg, #4b2e1d 0%, #2b1a0f 100%);
     color: #e6c9a8;
     position: absolute; width: 100%; height: 100%;
     z-index: 5;
@@ -278,4 +283,14 @@ body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
     padding: 8px 20px;
     cursor: pointer;
     margin-top: 10px;
+}
+
+
+@media (max-width : 700px) {
+    #city-input {
+        width: 150px;
+    }
+    #globeViz {
+        padding-top: 70px;
+    }
 }
