@@ -115,6 +115,19 @@ function updateMarkers() {
                 bookContainer.classList.add('active');
                 setTimeout(() => { bookContainer.classList.add('open'); }, 100);
             };
+            // [수정] 핀 생성 및 마우스 이벤트 부분
+            el.onmouseenter = () => { 
+                console.log("마우스 진입: 지구 회전 정지"); // 작동 확인용 콘솔
+                world.controls().autoRotate = false; 
+            };
+
+            el.onmouseleave = () => {
+                // 일기장이 열려있지(active) 않을 때만 다시 회전시킴
+                if (!document.getElementById('book-container').classList.contains('active')) {
+                    console.log("마우스 이탈: 지구 회전 시작");
+                    world.controls().autoRotate = true;
+                }
+            };
 
             return el;
         });
