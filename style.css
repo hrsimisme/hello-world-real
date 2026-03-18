@@ -65,16 +65,11 @@ body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
     display: flex;
     width: 100%;
     height: 100%;
-    border: green 1px solid;
 }
 
 .page-left, .page-right {
     flex: 1;
-    border: red 1px solid;
     padding: 20px;
-}
-.page-right > * {
-    border: blue 1px solid;
 }
 
 .close-book-btn {
