@@ -293,4 +293,8 @@ body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
     #globeViz {
         padding-top: 70px;
     }
+    .book-container {
+        width: 200px;
+        height: 138px;
+    }
 }
